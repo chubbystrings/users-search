@@ -1,5 +1,4 @@
 import { createContext, ReactNode, useReducer } from "react";
-import { Navigate } from "react-router-dom";
 import githubApi from "../../api/githubApi";
 import githubReducer from "./githubReducer";
 
@@ -12,6 +11,7 @@ interface Github {
     repos: Array<RepoType>;
     loading: boolean;
     user: {
+        id: number;
         login: string;
         avatar_url: string;
         name: any;
@@ -29,7 +29,7 @@ interface Github {
     };
     searchUsers: (text:string) => void;
     clearResults: () => void;
-    getUser: (login:any) => void;
+    getUser: (login:any, cb: () => void) => void;
     getRepos: (login:any) => void;
 }
 
@@ -81,23 +81,17 @@ export const GithubProvider = ({children}:Props) => {
     }
 
     // get single user
-    const getUser = async (login:string) => {
+    const getUser = async (login:string, cb:any) => {
         setLoading();
-        const {data} = await githubApi.get(`/users/${login}`);
+        try {
+            const {data} = await githubApi.get(`/users/${login}`);
 
-        if(data.status === 404) {
-            window.location.pathname = "/notfound"
-            // window.location = "/notfound"
-            // <Navigate replace to="/notfound" />
-            return(
-                <Navigate replace to="/login"/>
-            )
-        } else {    
             dispatch({
                 type: "GET_USER",
                 payload: data
             })
-            console.log(data)
+        } catch (error) {
+            return cb();
         }
     }
 
