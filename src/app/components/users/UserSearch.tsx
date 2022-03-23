@@ -1,26 +1,30 @@
 import { useState, useContext, ChangeEvent, FormEvent } from "react";
 import GithubContext from "../../context/github/githubContext";
+import Alert from "../layout/Alert";
 
 const UserSearch = () => {
     const [text, setText] = useState("");
 
     const {users, searchUsers, clearResults} = useContext(GithubContext);
+    const [alert, setAlert] = useState(false);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setText(e.target.value)
-        // console.log(e.target.value)
     }
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if(text === ""){
-            alert("please type something")
+            setAlert(true)
+            setTimeout(() => {setAlert(false)}, 3000)
         } else {
             searchUsers(text)
         }
         setText("")
     }
   return (
+     <div>
+         {alert && <Alert />}
     <div className="grid grid-cols-1 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 mb-8 gap-8">
       <div>
         <form onSubmit={handleSubmit}>
@@ -49,6 +53,7 @@ const UserSearch = () => {
         </div>
       )}
     </div>
+    </div> 
   );
 };
 
