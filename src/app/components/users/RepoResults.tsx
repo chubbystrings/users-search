@@ -1,18 +1,18 @@
 import { useContext } from "react";
-import UserItem from "./UserItem";
+import RepoItem from "./RepoItem";
 import Loader from "../layout/Loader";
 import GithubContext from "../../context/github/githubContext";
 import styled from "styled-components";
 
-const UserResults = () => {
-  const { users, loading } = useContext(GithubContext);
+const RepoResults = () => {
+  const {  loading, searchedRepos } = useContext(GithubContext);
 
   return loading ? (
     <Loader />
   ) : (
     <ItemWrapper className="">
-      {users.map((user) => (
-        <UserItem key={user.id} user={user} />
+      {searchedRepos.map((repo) => (
+        <RepoItem key={repo.id} repo={repo} />
       ))}
     </ItemWrapper>
   );
@@ -36,4 +36,4 @@ const ItemWrapper = styled.div`
   }
 `;
 
-export default UserResults;
+export default RepoResults;

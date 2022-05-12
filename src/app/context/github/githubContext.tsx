@@ -10,6 +10,7 @@ interface Github {
     users: Array<Type>;
     repos: Array<RepoType>;
     loading: boolean;
+    searchedRepos: Record<string, any>[]
     user: {
         id: number;
         login: string;
@@ -27,10 +28,13 @@ interface Github {
         public_gists: any;
         hireable: any;
     };
+    repoInfo: Record<string, any>;
     searchUsers: (text:string) => void;
     clearResults: () => void;
     getUser: (login:any, cb: () => void) => void;
     getRepos: (login:any) => void;
+    searchRepos: (tex: string) => void;
+    getRepo:  (name: string, owner: string) => void
 }
 
 interface Type {
@@ -56,10 +60,43 @@ export const GithubProvider = ({children}:Props) => {
         users: [],
         user: {},
         repos: [],
-        loading: false
+        loading: false,
+        searchedRepos: [],
+        repoInfo: {}
     }
 
     const [state, dispatch] = useReducer(githubReducer, initialState)
+
+    const getRepo = async (name: string, owner: string) => {
+        setLoading();
+        
+        const {data} = await githubApi.get(`/repos/${owner}/${name}`);
+
+
+
+        dispatch({
+            type: "REPO_INFO",
+            payload: data
+        })
+    }
+
+    const searchRepos = async (text: string) => {
+        setLoading();
+        const params = new URLSearchParams({
+            q: text,
+            sort: "created",
+            per_page: "30",
+        })
+        const {data} = await githubApi.get(`/search/repositories?q=${params}`);
+        console.log(data)
+
+        const items = data.items;
+
+        dispatch({
+            type: "SEARCH_REPOS",
+            payload: items
+        })
+    }
 
     
     // get search results
@@ -106,6 +143,8 @@ export const GithubProvider = ({children}:Props) => {
         
         const {data} = await githubApi.get(`/users/${login}/repos?${params}`);
 
+        console.log(data)
+
         dispatch({
             type: "GET_REPOS",
             payload: data
@@ -128,7 +167,10 @@ export const GithubProvider = ({children}:Props) => {
             getUser,
             searchUsers,
             clearResults,
-            getRepos
+            getRepos,
+            searchRepos,
+            getRepo,
+            
         }}>
             {children}
         </GithubContext.Provider>

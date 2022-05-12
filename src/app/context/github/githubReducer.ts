@@ -28,6 +28,18 @@ const githubReducer = (state:any, action:any) => {
                 ...state,
                 users: []
             }
+        case "SEARCH_REPOS": 
+            return {
+                ...state,
+                searchedRepos: action.payload,
+                loading: false
+            }
+        case "REPO_INFO":
+            return {
+                ...state,
+                repoInfo: action.payload,
+                loading: false
+            }
         default: 
             return state
     }
